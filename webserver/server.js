@@ -6,6 +6,7 @@ const port = process.env.port || 3000;
 let app = express();
 
 hbs.registerPartials(__dirname + '/views/partials');
+app.set('views', __dirname + '/views');
 app.set('view engine', 'hbs');
 
 
@@ -26,7 +27,7 @@ app.use((req, res, next) => {
 // });
 
 // Middleware for static resources
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/webserver/public'));
 
 hbs.registerHelper('getCurrentYear', () => new Date().getFullYear() + 1000);
 hbs.registerHelper('screamIt', text => typeof text === 'string' ? text.toUpperCase() : text);
