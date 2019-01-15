@@ -20,8 +20,8 @@ app.post('/todos', (req, res) => {
         text: req.body.text
     });
 
-    newTodo.save().then((doc) => {
-        res.send(doc);
+    newTodo.save().then((todo) => {
+        res.send({todo});
     }, (e) => {
         res.status(400).send(e);
     });

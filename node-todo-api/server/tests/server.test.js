@@ -10,7 +10,9 @@ const mockTodos = [{
     text: 'First test todo'
 }, {
     _id: new ObjectID(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completedAt: 333
 }];
 
 beforeEach((done) => {
@@ -29,7 +31,7 @@ describe('POST /todos', () => {
             .send({ text })
             .expect(200)
             .expect((res) => {
-                expect(res.body.text).toBe(text);
+                expect(res.body.todo.text).toBe(text);
             })
             .end((err, res) => {
                 if (err) {
@@ -144,3 +146,61 @@ describe('DELETE /todos/:id', () => {
             .end(done);
     });
 });
+
+describe('PATCH /todos/:id', () => {
+    it('should update the todo', (done) => {
+        let hexId = mockTodos[0]._id.toHexString();
+        let body = {
+            text: 'New text',
+            completed: true
+        };
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send(body)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(body.text);
+            })
+            .end((err, res) => {
+                if (err) {
+                    // Do this so test properly fails
+                    return done(err);
+                }
+
+                Todo.findById(hexId).then((todo) => {
+                    expect(todo.text).toBe(body.text);
+                    expect(todo.completed).toBe(true);
+                    expect(todo.completedAt).toBeA('number');
+                    done();
+                }).catch((e) => done(e));
+            });
+    });
+
+    it('should clear completed at when todo not completed', (done) => {
+        let hexId = mockTodos[1]._id.toHexString();
+        let body = {
+            text: 'New text 2',
+            completed: false
+        };
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send(body)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(body.text);
+            })
+            .end((err, res) => {
+                if (err) {
+                    // Do this so test properly fails
+                    return done(err);
+                }
+
+                Todo.findById(hexId).then((todo) => {
+                    expect(todo.text).toBe(body.text);
+                    expect(todo.completed).toBe(false);
+                    expect(todo.completedAt).toNotExist();
+                    done();
+                }).catch((e) => done(e));
+            });
+    });
+}); 
