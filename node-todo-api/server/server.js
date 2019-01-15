@@ -54,7 +54,6 @@ app.get('/todos/:id', (req, res) => {
 
 app.delete('/todos/:id', (req, res) => {
     let id = req.params.id;
-    console.log(id);
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();
     }
